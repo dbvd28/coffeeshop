@@ -9,7 +9,7 @@ class Login extends \Controllers\PublicController
     private $generalError = "";
     private $hasError = false;
 
-    public function run() :void
+    public function run(): void
     {
         if ($this->isPostBack()) {
             $this->txtEmail = $_POST["txtEmail"];
@@ -23,7 +23,7 @@ class Login extends \Controllers\PublicController
                 $this->errorPswd = "¡Debe ingresar una contraseña!";
                 $this->hasError = true;
             }
-            if (! $this->hasError) {
+            if (!$this->hasError) {
                 if ($dbUser = \Dao\Security\Security::getUsuarioByEmail($this->txtEmail)) {
                     if ($dbUser["userest"] != \Dao\Security\Estados::ACTIVO) {
                         $this->generalError = "¡Credenciales son incorrectas!";
@@ -49,7 +49,7 @@ class Login extends \Controllers\PublicController
                         );
                         // Aqui se debe establecer acciones segun la politica de la institucion.
                     }
-                    if (! $this->hasError) {
+                    if (!$this->hasError) {
                         \Utilities\Security::login(
                             $dbUser["usercod"],
                             $dbUser["username"],
@@ -60,7 +60,12 @@ class Login extends \Controllers\PublicController
                                 \Utilities\Context::getContextByKey("redirto")
                             );
                         } else {
-                            \Utilities\Site::redirectTo("index.php");
+                            if ((\Dao\Security\Security::validateRole($dbUser["usercod"]))) {
+                                \Utilities\Site::redirectToWithMsg("index.php?page=Administrator-Orders","Bienvenido ".$dbUser["username"]);
+                            } else {
+                                \Utilities\Site::redirectToWithMsg("index.php","Bienvenido");
+                            }
+
                         }
                     }
                 } else {
