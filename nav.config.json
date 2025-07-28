@@ -16,6 +16,10 @@
       "id":"Menu_PaymentCheckout",
       "nav_url": "index.php?page=Checkout_Checkout",
       "nav_label": "Carretilla de Compra"
-    }
+    },
+    {"id":"Menu_Administrator_Orders",
+      "nav_url": "index.php?page=Administrator-Orders",
+      "nav_label": "Administrador de pedidos"
+  }
   ]
 }
