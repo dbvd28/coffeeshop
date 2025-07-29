@@ -146,3 +146,23 @@ CREATE TABLE `carretillaanon` (
     KEY `productId_idx` (`productId`),
     CONSTRAINT `carretillaanon_prd_key` FOREIGN KEY (`productId`) REFERENCES `productos` (`productId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
+/*Inserts*/
+INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Admin','Administradores','ACT');
+INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Client','Cliente','ACT');
+    INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Orders','Controllers\\Administrator\\Orders','ACT','CTR');
+    INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Order','Controllers\\Administrator\\Order','ACT','CTR');
+INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Order','Controllers\\Administrator\\Order\\update','ACT','CTR');
+INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Order','ACT','2025-08-09 00:00:00');
+INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Orders','ACT','2025-08-09 00:00:00');
+INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Order\\update','ACT','2025-08-09 00:00:00');
+INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Menu_Administrator_Orders','ACT','2025-08-09 00:00:00');
+
+/*Trigger de la tabla usuario para que cada usuario que se ingrese agarre el rol de cliente*/
+CREATE TRIGGER client_role
+AFTER INSERT ON usuario
+FOR EACH ROW
+BEGIN
+DECLARE clientrole varchar(128);
+Select rolescod into clientrole FROM roles where rolescod='Client' LIMIT 1;
+INSERT INTO roles_usuarios(usercod,rolescod,roleuserest,roleuserfch,roleuserexp) VALUES ( NEW.usercod,clientrole,'ACT',NOW(), DATE_ADD(NOW(), INTERVAL 10 YEAR));
+END
