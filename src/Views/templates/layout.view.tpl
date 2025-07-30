@@ -38,6 +38,7 @@
       {{endfor PUBLIC_NAVIGATION}}
     </ul>
   </nav>
+  <span>{{if ~CART_ITEMS}}<a href="index.php?page=Sec-Login"><i class="fa-solid fa-cart-shopping" style="color:white;"></i></a></a>{{~CART_ITEMS}}{{endif ~CART_ITEMS}}</span>
 </header>
   <main>
   {{{page_content}}}
