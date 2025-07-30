@@ -47,14 +47,6 @@
         </tr>
       </tfoot>
     </table>
+    <a href="index.php?page=Client-Orders" class="btn">Volver a mis pedidos</a>
   </div>
-  <script>
-    document.addEventListener("DOMContentLoaded", ()=>{
-        document.getElementById("back_btn")
-            .addEventListener("click", (e)=>{
-                e.preventDefault();
-                e.stopPropagation();
-                window.location.assign("index.php?page=Client-Orders");
-            });
-    });
-</script>
+ 
