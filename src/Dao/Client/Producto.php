@@ -1,26 +1,13 @@
 <?php
-namespace DAO;
+namespace DAO\Client;
 
-use PDO;
-use PDOException;
+use Dao\Table;
 
-class Product {
-    private $pdo;
 
-    public function __construct(PDO $pdo) {
-        $this->pdo = $pdo;
-    }
+class Producto extends Table {
 
-    public function getActiveProducts() {
-        $sql = "SELECT productId, productName, productDescription, productPrice, productImgUrl, productStock 
-                FROM productos 
-                WHERE productStatus = 'ACT' AND productStock > 0";
-        try {
-            $stmt = $this->pdo->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            // Manejo de error
-            return [];
-        }
+    public static function getAll()
+    {
+        return self::obtenerRegistros("SELECT * FROM productos", []);
     }
 }
