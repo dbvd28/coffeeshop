@@ -1,5 +1,5 @@
 <div class="container">
-    <button class="back-btn" id="back_btn">Back</button>
+    <button class="back-btn" id="back_btn">Atras</button>
     <h1>Pedido #{{id}}</h1>
 
     <form action="index.php?page=Administrator-Order&mode={{mode}}&id={{id}}" method="post" class="details">

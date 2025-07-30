@@ -1,5 +1,6 @@
 <?php
 namespace Controllers\Sec;
+use Utilities\Site;
 class Login extends \Controllers\PublicController
 {
     private $txtEmail = "";
@@ -56,14 +57,14 @@ class Login extends \Controllers\PublicController
                             $dbUser["useremail"]
                         );
                         if (\Utilities\Context::getContextByKey("redirto") !== "") {
-                            \Utilities\Site::redirectTo(
+                            Site::redirectTo(
                                 \Utilities\Context::getContextByKey("redirto")
                             );
                         } else {
                             if ((\Dao\Security\Security::validateRole($dbUser["usercod"]))) {
-                                \Utilities\Site::redirectToWithMsg("index.php?page=Administrator-Orders","Bienvenido ".$dbUser["username"]);
+                                Site::redirectTo("index.php?page=Administrator-Orders");
                             } else {
-                                \Utilities\Site::redirectToWithMsg("index.php","Bienvenido");
+                                Site::redirectTo("index.php");
                             }
 
                         }
@@ -80,6 +81,7 @@ class Login extends \Controllers\PublicController
             }
         }
         $dataView = get_object_vars($this);
+        Site::addLink("public/css/login.css");
         \Views\Renderer::render("security/login", $dataView);
     }
 }

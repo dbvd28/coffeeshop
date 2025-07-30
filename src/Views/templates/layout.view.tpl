@@ -16,27 +16,33 @@
   {{endfor BeginScripts}}
 </head>
 <body>
-  <header>
-    <input type="checkbox" class="menu_toggle" id="menu_toggle" />
-    <label for="menu_toggle" class="menu_toggle_icon" >
-      <div class="hmb dgn pt-1"></div>
-      <div class="hmb hrz"></div>
-      <div class="hmb dgn pt-2"></div>
-    </label>
+  <header style="background-color: #9c653d;">
+  <input type="checkbox" class="menu_toggle" id="menu_toggle" />
+  <label for="menu_toggle" class="menu_toggle_icon" >
+    <div class="hmb dgn pt-1"></div>
+    <div class="hmb hrz"></div>
+    <div class="hmb dgn pt-2"></div>
+  </label>
+
+  <div class="brand" style="display: flex; align-items:center;">
+    <img src="public/imgs/hero/logo.png" alt="Coffee Logo" class="logo" style="height:40px; width:auto; border-radius:17px;"/>
     <h1>{{SITE_TITLE}}</h1>
-    <nav id="menu">
-      <ul>
-        <li><a href="index.php?page={{PUBLIC_DEFAULT_CONTROLLER}}"><i class="fas fa-home"></i>&nbsp;Inicio</a></li>
-        {{foreach PUBLIC_NAVIGATION}}
-            <li><a href="{{nav_url}}">{{nav_label}}</a></li>
-        {{endfor PUBLIC_NAVIGATION}}
-      </ul>
-    </nav>
-  </header>
+  </div>
+
+  <nav id="menu" style="background-color: #9c653d;">
+    <ul>
+      <li><a href="index.php?page={{PUBLIC_DEFAULT_CONTROLLER}}">
+        <i class="fas fa-home"></i>&nbsp;Inicio</a></li>
+      {{foreach PUBLIC_NAVIGATION}}
+        <li><a href="{{nav_url}}">{{nav_label}}</a></li>
+      {{endfor PUBLIC_NAVIGATION}}
+    </ul>
+  </nav>
+</header>
   <main>
   {{{page_content}}}
   </main>
-  <footer>
+  <footer style="background-color: #9c653d;">
     <div>Todo los Derechos Reservados {{~CURRENT_YEAR}} &copy;</div>
   </footer>
   {{foreach EndScripts}}
