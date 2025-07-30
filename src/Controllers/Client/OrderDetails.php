@@ -5,69 +5,62 @@ namespace Controllers\Client;
 use Controllers\PrivateController;
 use Dao\Client\Orders as ODAO;
 use Views\Renderer;
-
 use Utilities\Site;
-use Utilities\Validators;
 
-const LIST_URL = "index.php?page=Client-Orders";
-
-class Order extends PrivateController
+class OrderDetails extends PrivateController
 {
     private array $viewData;
-    private array $status;
 
     public function __construct()
     {
         parent::__construct();
         $this->viewData = [
-            "mode" => "DSP",
             "id" => 0,
             "fecha" => "",
             "estado" => "",
-            "nombre" => "",
-            "correo" => "",
             "total" => "",
             "productos" => [],
-            "readonly" => "readonly",
+            "nombre" => "",
+            "correo" => "",
             "errors" => [],
-            "cancelLabel" => "Back",
-            "showConfirm" => false,
+            "readonly" => "readonly",
+            "mode" => "DSP",
+            "modeDsc" => "Detalle del pedido"
         ];
-        $this->status = ["ENV", "PAG", "PEND"];
     }
 
     public function run(): void
     {
         if (!isset($_GET["id"]) || !is_numeric($_GET["id"])) {
-            Site::redirectToWithMsg("index.php?page=Client-Orders", "Invalid request.");
+            Site::redirectToWithMsg("index.php?page=Client-OrderHistory", "ID de pedido inválido");
+            return;
         }
-        $this->viewData["id"] = intval($_GET["id"]);
-        $userId = $_SESSION["usercod"] ?? 0;
 
+        $this->viewData["id"] = intval($_GET["id"]);
+        $usercod = $_SESSION["usercod"] ?? 0;
+
+        // Obtener pedido solo si pertenece al usuario
         $pedido = ODAO::getOrdersById($this->viewData["id"]);
 
-        // Validar que el pedido pertenece al usuario
-        if (!$pedido || $pedido["usercod"] != $userId) {
-            Site::redirectToWithMsg("index.php?page=Client-Orders", "Access denied.");
+        if (!$pedido || $pedido["usercod"] != $usercod) {
+            Site::redirectToWithMsg("index.php?page=Client-OrderHistory", "No tienes permiso para ver este pedido.");
+            return;
         }
 
         $this->viewData["fecha"] = $pedido["fchpedido"];
         $this->viewData["estado"] = $pedido["estado"];
+        $this->viewData["total"] = $pedido["total"];
         $this->viewData["nombre"] = $pedido["username"];
         $this->viewData["correo"] = $pedido["useremail"];
-        $this->viewData["total"] = $pedido["total"];
 
         $productos = ODAO::getProductsOrders($this->viewData["id"]);
         if (is_array($productos)) {
             foreach ($productos as &$producto) {
-                $cantidad = (float)$producto["cantidad"];
-                $precio = (float)$producto["precio_unitario"];
-                $producto["subtotal"] = number_format($cantidad * $precio, 2, '.', '');
+                $producto["subtotal"] = number_format($producto["cantidad"] * $producto["precio_unitario"], 2, ".", "");
             }
             $this->viewData["productos"] = $productos;
         }
 
-        Site::addLink("public/css/order.css");
-        Renderer::render("Client/Order", $this->viewData);
+        Renderer::render("Client/OrderDetails", $this->viewData);
     }
 }
