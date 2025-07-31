@@ -25,13 +25,7 @@
     {
       "id": "Menu_Client_Orders",
       "nav_url": "index.php?page=Client-Orders",
-      "nav_label": "<i class=\"fas fa-shopping-cart\"></i>&nbsp;Mis pedidos",
-      "roles": ["cliente"]
-    },
-    {
-      "id": "Menu_Client_OrderHistory",
-      "nav_url": "index.php?page=Client-OrderHistory",
-      "nav_label": "<i class=\"fas fa-history\"></i>&nbsp;Historial de pedidos",
+      "nav_label": "Mis pedidos",
       "roles": ["cliente"]
     }
   ]
