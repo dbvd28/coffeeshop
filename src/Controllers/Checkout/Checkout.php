@@ -5,6 +5,7 @@ namespace Controllers\Checkout;
 use Controllers\PublicController;
 use Dao\Cart\Cart;
 use Utilities\Security;
+use Dao\Administrator\Orders;
 
 class Checkout extends PublicController{
       public function run(): void
@@ -43,8 +44,8 @@ class Checkout extends PublicController{
             if ($processPayment) {
                 $PayPalOrder = new \Utilities\Paypal\PayPalOrder(
                     "test" . (time() - 10000000),
-                    "http://localhost/coffeeshop/index.php?page=Checkout-Error",
-                    "http://localhost/coffeeshop/index.php?page=Checkout-Accept"
+                    "http://localhost:8888/coffeeshop/index.php?page=Checkout-Error",
+                    "http://localhost:8888/coffeeshop/index.php?page=Checkout-Accept"
                 );
                 $viewData["carretilla"] = $carretilla;
                 foreach ($viewData["carretilla"] as $producto) {
@@ -57,8 +58,9 @@ class Checkout extends PublicController{
                         $producto["crrctd"],
                         "DIGITAL_GOODS"
                     );
+                    Orders::addToTempCart(Security::getUserId(),$producto["productId"],$producto["crrctd"],$producto["crrprc"]);
                 }
-
+                
                 $PayPalRestApi = new \Utilities\PayPal\PayPalRestApi(
                     \Utilities\Context::getContextByKey("PAYPAL_CLIENT_ID"),
                     \Utilities\Context::getContextByKey("PAYPAL_CLIENT_SECRET")

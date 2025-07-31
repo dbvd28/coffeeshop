@@ -28,5 +28,5 @@
       {{endfor productos}}
     </tbody>
   </table>
-  <a class="btn view" href="index.php?page=Client-Order&mode=DSP&id={{pedidoId}}">
+ <!-- <a class="btn view" href="index.php?page=Client-Order&mode=DSP&id={{pedidoId}}">-->
 </div>

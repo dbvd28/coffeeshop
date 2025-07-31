@@ -4,6 +4,7 @@ namespace Controllers\Client;
 
 use Controllers\PrivateController;
 use Dao\Client\Orders as ODAO;
+use Utilities\Security;
 use Views\Renderer;
 use Utilities\Site;
 
@@ -20,7 +21,7 @@ class Orders extends PrivateController
     public function run(): void
     {
         // Obtener ID del usuario autenticado (suponiendo que está en sesión)
-        $userId = $_SESSION["usercod"] ?? 0;
+        $userId =Security::getUserId();
 
         // Obtener pedidos solo del cliente logueado
         $this->viewData["pedidos"] = ODAO::getOrdersByUserId($userId);

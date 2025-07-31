@@ -31,4 +31,45 @@ class Orders extends Table
         $sqlstr = "UPDATE pedidos SET estado=:estado WHERE pedidoId=:id";
         return self::executeNonQuery($sqlstr, ["id" => $id, "estado" => $estado]);
     }
+    public static function addOrder(int $user, float $total, string $archivo)
+    {
+        $sqlstr = "INSERT INTO pedidos (usercod,fchpedido,total,archivojson) VALUES(:user,:fecha,:total,:archivo)";
+        return self::executeInsert($sqlstr, ["user" => $user, "fecha" => time(), "total" => $total, "archivo" => $archivo]);
+    }
+    public static function addToTempCart(int $userId, int $productId, int $cant,float $precio)
+    {
+        $sql = "INSERT INTO temp_cart (user_id, product_id, quantity,price)
+            VALUES (:user_id, :product_id, :quantity,:price)";
+        $params = [
+            "user_id" => $userId,
+            "product_id" => $productId,
+            "quantity" => $cant,
+            "price"=>$precio,
+        ];
+        return self::executeNonQuery($sql, $params);
+    }
+    public static function transferTempCartToOrder(int $userId, int $orderId)
+    {
+        // 1. Agarra los items del carrito
+        $sql = "SELECT product_id, quantity,price FROM temp_cart WHERE user_id = :user_id";
+        $params = ["user_id" => $userId];
+        $cartItems = self::obtenerRegistros($sql, $params);
+
+        // 2. Inserta en detalle_pedidos
+        foreach ($cartItems as $item) {
+            $insert = "INSERT INTO detalle_pedidos (pedidoId, productoId, cantidad,precio_unitario)
+                   VALUES (:order_id, :product_id, :quantity, :price)";
+            $insertParams = [
+                "order_id" => $orderId,
+                "product_id" => $item["product_id"],
+                "quantity" => $item["quantity"],
+                "price"=>$item["price"]
+            ];
+            self::executeNonQuery($insert, $insertParams);
+        }
+
+        // 3. Elimina del carrito temporal
+        $delete = "DELETE FROM temp_cart WHERE user_id = :user_id";
+        self::executeNonQuery($delete, ["user_id"=>$userId]);
+    }
 }
