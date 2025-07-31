@@ -5,11 +5,7 @@ namespace Controllers\Client;
 use Controllers\PrivateController;
 use Dao\Client\Orders as ODAO;
 use Views\Renderer;
-
 use Utilities\Site;
-use Utilities\Validators;
-
-const LIST_URL = "index.php?page=Client-Orders";
 
 class Order extends PrivateController
 {
@@ -19,8 +15,8 @@ class Order extends PrivateController
     public function __construct()
     {
         parent::__construct();
+
         $this->viewData = [
-            "mode" => "DSP",
             "id" => 0,
             "fecha" => "",
             "estado" => "",
@@ -28,27 +24,42 @@ class Order extends PrivateController
             "correo" => "",
             "total" => "",
             "productos" => [],
-            "readonly" => "readonly",
             "errors" => [],
-            "cancelLabel" => "Back",
-            "showConfirm" => false,
         ];
+
         $this->status = ["ENV", "PAG", "PEND"];
     }
 
     public function run(): void
     {
+        var_dump($_SESSION["usercod"]);
+        exit;
+        $this->getQueryParamsData();
+        $this->getDataFromDB();
+
+        Site::addLink("public/css/order.css");
+        Renderer::render("Client/order", $this->viewData);
+    }
+
+    private function getQueryParamsData()
+    {
         if (!isset($_GET["id"]) || !is_numeric($_GET["id"])) {
-            Site::redirectToWithMsg("index.php?page=Client-Orders", "Invalid request.");
+            Site::redirectToWithMsg("index.php?page=Client-Orders", "Pedido no válido.");
+            exit;
         }
         $this->viewData["id"] = intval($_GET["id"]);
+    }
+
+    private function getDataFromDB()
+    {
         $userId = $_SESSION["usercod"] ?? 0;
 
-        $pedido = ODAO::getOrdersById($this->viewData["id"]);
+        $pedido = ODAO::getOrderByIdForUser($this->viewData["id"], $userId);
+        
 
-        // Validar que el pedido pertenece al usuario
-        if (!$pedido || $pedido["usercod"] != $userId) {
-            Site::redirectToWithMsg("index.php?page=Client-Orders", "Access denied.");
+        if (!$pedido) {
+            Site::redirectToWithMsg("index.php?page=Client-Orders", "Pedido no encontrado o no autorizado.");
+            exit;
         }
 
         $this->viewData["fecha"] = $pedido["fchpedido"];
@@ -58,16 +69,13 @@ class Order extends PrivateController
         $this->viewData["total"] = $pedido["total"];
 
         $productos = ODAO::getProductsOrders($this->viewData["id"]);
-        if (is_array($productos)) {
-            foreach ($productos as &$producto) {
-                $cantidad = (float)$producto["cantidad"];
-                $precio = (float)$producto["precio_unitario"];
-                $producto["subtotal"] = number_format($cantidad * $precio, 2, '.', '');
-            }
-            $this->viewData["productos"] = $productos;
+        foreach ($productos as &$producto) {
+            $cantidad = (float) $producto["cantidad"];
+            $precio = (float) $producto["precio_unitario"];
+            $producto["subtotal"] = number_format($cantidad * $precio, 2, '.', '');
         }
+        $this->viewData["productos"] = $productos;
 
-        Site::addLink("public/css/order.css");
-        Renderer::render("Client/Order", $this->viewData);
+      
     }
 }
