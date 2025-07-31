@@ -3,7 +3,8 @@
       "psr-4": {"":"src/"}
     },
     "require": {
-        "wikimedia/less.php": "^5.4"
+        "wikimedia/less.php": "^5.4",
+        "paypal/paypal-checkout-sdk": "^1.0"
     },
     "scripts": {
       "less":"lessc ./public/css_src/style.less ./public/css/appstyle.css"
