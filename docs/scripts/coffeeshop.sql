@@ -168,22 +168,3 @@ INSERT INTO roles_usuarios(usercod,rolescod,roleuserest,roleuserfch,roleuserexp)
 END
 
 
-/*INSERT FUNCIONES PARA CLIENTE*/
-
--- Registrar los controladores como funciones
-INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`)
-VALUES
-('Controllers\\Client\\Orders', 'Pedidos actuales del cliente', 'ACT', 'CTR'),
-('Controllers\\Client\\OrderHistory', 'Historial de pedidos del cliente', 'ACT', 'CTR');
-
-
-INSERT INTO funciones (fncod, fndsc, fnest, fntyp) VALUES
-('Menu_Client_Orders', 'Menú de pedidos del cliente', 'ACT', 'MNU'),
-('Menu_Client_OrderHistory', 'Menú de historial de pedidos del cliente', 'ACT', 'MNU');
-
-INSERT INTO funciones_roles (rolescod, fncod, fnrolest, fnexp)
-VALUES 
-('Cliente','Controllers\\Client\\Orders','ACT','2025-08-09 00:00:00'),
-('Cliente','Controllers\\Client\\OrderHistory','ACT','2025-08-09 00:00:00'),
-('Cliente','Menu_Client_Orders','ACT','2025-08-09 00:00:00'),
-('Cliente','Menu_Client_OrderHistory','ACT','2025-08-09 00:00:00');
