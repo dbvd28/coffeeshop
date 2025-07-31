@@ -15,18 +15,17 @@
     {
       "id": "Menu_PaymentCheckout",
       "nav_url": "index.php?page=Checkout_Checkout",
-      "nav_label": "Carretilla de Compra"
+      "nav_label": "<i class=\"fa-solid fa-cart-shopping\"></i>&nbspCarretilla de Compra"
     },
     {
       "id": "Menu_Administrator_Orders",
       "nav_url": "index.php?page=Administrator-Orders",
-      "nav_label": "Administrador de pedidos"
+      "nav_label": "<i class=\"fas fa-desktop\"></i>&nbsp;Administrador de pedidos"
     },
     {
       "id": "Menu_Client_Orders",
       "nav_url": "index.php?page=Client-Orders",
-      "nav_label": "Mis pedidos",
-      "roles": ["cliente"]
+      "nav_label": "<i class=\"fa-solid fa-box\"></i>&nbsp;Mis pedidos"
     }
   ]
 }
