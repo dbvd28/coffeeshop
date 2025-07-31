@@ -109,10 +109,19 @@ CREATE TABLE `pedidos` (
     `fchpedido` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `estado` ENUM('PEND', 'PAG', 'ENV', 'CAN') NOT NULL DEFAULT 'PEND',
     `total` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    `archivojson` longtext not null,
     PRIMARY KEY (`pedidoId`),
     CONSTRAINT `pedidos_usr_key` FOREIGN KEY (`usercod`) REFERENCES `usuario` (`usercod`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4;
 
+CREATE TABLE temp_cart (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `quantity` INT NOT NULL DEFAULT 1,
+    `price` float NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 CREATE TABLE `detalle_pedidos` (
     `detalleId` INT AUTO_INCREMENT NOT NULL,
     `pedidoId` INT NOT NULL,

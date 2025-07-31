@@ -4,6 +4,7 @@ namespace Controllers\Client;
 
 use Controllers\PrivateController;
 use Dao\Client\Orders as ODAO;
+use Utilities\Security;
 use Views\Renderer;
 use Utilities\Site;
 
@@ -32,8 +33,6 @@ class Order extends PrivateController
 
     public function run(): void
     {
-        var_dump($_SESSION["usercod"]);
-        exit;
         $this->getQueryParamsData();
         $this->getDataFromDB();
 
@@ -52,7 +51,7 @@ class Order extends PrivateController
 
     private function getDataFromDB()
     {
-        $userId = $_SESSION["usercod"] ?? 0;
+        $userId = Security::getUserId();
 
         $pedido = ODAO::getOrderByIdForUser($this->viewData["id"], $userId);
         
