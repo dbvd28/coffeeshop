@@ -32,8 +32,8 @@ class Products extends PrivateController
             "estado" => "ACT",
             "cat" => 0,
             "prov" => 0,
-            "selectedidp" => "selected",
-            "selectedidc" => "selected",
+            "selectedidp" => "",
+            "selectedidc" => "",
             "proveedor" => [],
             "selectedACT" => "",
             "selectedINA" => "",
@@ -57,8 +57,9 @@ class Products extends PrivateController
         if ($this->viewData["mode"] !== "INS") {
             $this->getDataFromDB();
         } else {
+           
             $this->viewData["proveedor"] = ProductDAO::getAllProv();
-            $this->viewData["categoria"] = ProductDAO::getAllCat();
+             $this->viewData["categoria"] = ProductDAO::getAllCat();
         }
         if ($this->isPostBack()) {
             $this->getBodyData();
@@ -133,22 +134,23 @@ class Products extends PrivateController
             $idp = $tmpPedido["proveedorId"];
             $proveedores = ProductDAO::getAllProv();
             foreach ($proveedores as &$proveedor) {
-                $proveedor["idc"] = ($proveedor["proveedorId"] == $idp) ? "selected" : "";
+                $proveedor["selectedidp"] = ($proveedor["proveedorId"] == $idp) ? "selected" : "";
             }
+            $this->viewData["proveedor"] = $proveedores;
             $idc = $tmpPedido["categoriaId"];
             $categorias = ProductDAO::getAllCat();
             foreach ($categorias as &$categoria) {
-                $categoria["idc"] = ($categoria["categoriaId"] == $idc) ? "selected" : "";
+                $categoria["selectedidc"] = ($categoria["categoriaId"] == $idc) ? "selected" : "";
             }
-
+            $this->viewData["categoria"] = $categorias;
         } else {
             $this->throwError(
                 "Something went wrong, try again.",
                 "Record for id " . $this->viewData["id"] . " not found."
             );
         }
-        $this->viewData["proveedor"] = ProductDAO::getAllProv();
-        $this->viewData["categoria"] = ProductDAO::getAllCat();
+        //$this->viewData["proveedor"] = ProductDAO::getAllProv();
+        //$this->viewData["categoria"] = ProductDAO::getAllCat();
     }
 
     private function getBodyData()
