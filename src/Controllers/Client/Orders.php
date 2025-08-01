@@ -26,7 +26,7 @@ class Orders extends PrivateController
         // Obtener pedidos solo del cliente logueado
         $this->viewData["pedidos"] = ODAO::getOrdersByUserId($userId);
 
-        Site::addLink("public/css/orders2.css");
+        Site::addLink("public/css/orderclient.css");
         Renderer::render("Client/orders", $this->viewData);
     }
 }
