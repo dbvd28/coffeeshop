@@ -40,7 +40,7 @@
   </nav>
   <span>{{if ~CART_ITEMS}}<a href="index.php?page=Sec-Login"><i class="fa-solid fa-cart-shopping" style="color:white;"></i></a></a>{{~CART_ITEMS}}{{endif ~CART_ITEMS}}</span>
 </header>
-  <main>
+  <main style="flex:1;">
   {{{page_content}}}
   </main>
   <footer style="background-color: #9c653d;">
