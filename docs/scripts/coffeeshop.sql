@@ -1,5 +1,6 @@
-CREATE SCHEMA `coffeeshop` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-
+/*CREATE SCHEMA `coffeeshop` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+*/
+/*
 CREATE TABLE `usuario` (
     `usercod` bigint(10) NOT NULL AUTO_INCREMENT,
     `useremail` varchar(80) DEFAULT NULL,
@@ -21,14 +22,15 @@ CREATE TABLE `usuario` (
         `userest`
     )
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8;
-
-CREATE TABLE `roles` (
+*/
+/*CREATE TABLE `roles` (
     `rolescod` varchar(128) NOT NULL,
     `rolesdsc` varchar(45) DEFAULT NULL,
     `rolesest` char(3) DEFAULT NULL,
     PRIMARY KEY (`rolescod`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
+*/
+/*
 CREATE TABLE `roles_usuarios` (
     `usercod` bigint(10) NOT NULL,
     `rolescod` varchar(128) NOT NULL,
@@ -40,7 +42,8 @@ CREATE TABLE `roles_usuarios` (
     CONSTRAINT `rol_usuario_key` FOREIGN KEY (`rolescod`) REFERENCES `roles` (`rolescod`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `usuario_rol_key` FOREIGN KEY (`usercod`) REFERENCES `usuario` (`usercod`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
+*/
+/*
 CREATE TABLE `funciones` (
     `fncod` varchar(255) NOT NULL,
     `fndsc` varchar(255) DEFAULT NULL,
@@ -48,7 +51,8 @@ CREATE TABLE `funciones` (
     `fntyp` char(3) DEFAULT NULL,
     PRIMARY KEY (`fncod`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
+*/
+/*
 CREATE TABLE `funciones_roles` (
     `rolescod` varchar(128) NOT NULL,
     `fncod` varchar(255) NOT NULL,
@@ -59,7 +63,8 @@ CREATE TABLE `funciones_roles` (
     CONSTRAINT `funcion_rol_key` FOREIGN KEY (`rolescod`) REFERENCES `roles` (`rolescod`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `rol_funcion_key` FOREIGN KEY (`fncod`) REFERENCES `funciones` (`fncod`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
+*/
+/*
 CREATE TABLE `bitacora` (
     `bitacoracod` int(11) NOT NULL AUTO_INCREMENT,
     `bitacorafch` datetime DEFAULT NULL,
@@ -70,6 +75,8 @@ CREATE TABLE `bitacora` (
     `bitusuario` bigint(18) DEFAULT NULL,
     PRIMARY KEY (`bitacoracod`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 DEFAULT CHARSET = utf8;
+*/
+/*
 
 CREATE TABLE `proveedores` (
     `proveedorId` INT NOT NULL AUTO_INCREMENT,
@@ -80,15 +87,17 @@ CREATE TABLE `proveedores` (
     `direccion` TEXT,
     PRIMARY KEY (`proveedorId`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 DEFAULT CHARSET = utf8;
-
+*/
+/*
 CREATE TABLE `categorias` (
     `categoriaId` INT NOT NULL AUTO_INCREMENt,
     `nombre` VARCHAR(50) NOT NULL,
     `descripcion` TEXT,
     PRIMARY KEY (`categoriaId`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 10 DEFAULT CHARSET = utf8;
+*/
 
-CREATE TABLE `productos` (
+/*CREATE TABLE `productos` (
     `productId` bigint(18) NOT NULL AUTO_INCREMENT,
     `productName` varchar(255) NOT NULL,
     `productDescription` text NOT NULL,
@@ -102,7 +111,8 @@ CREATE TABLE `productos` (
     CONSTRAINT `productos_prvd_key` FOREIGN KEY (`proveedorId`) REFERENCES `proveedores` (`proveedorId`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `productos_categ_key` FOREIGN KEY (`categoriaId`) REFERENCES `categorias` (`categoriaId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4;
-
+*/
+/*
 CREATE TABLE `pedidos` (
     `pedidoId` INT AUTO_INCREMENT NOT NULL,
     `usercod` BIgINT(10) NOT NULL,
@@ -113,7 +123,8 @@ CREATE TABLE `pedidos` (
     PRIMARY KEY (`pedidoId`),
     CONSTRAINT `pedidos_usr_key` FOREIGN KEY (`usercod`) REFERENCES `usuario` (`usercod`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4;
-
+*/
+/*
 CREATE TABLE `temp_cart` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
@@ -121,7 +132,8 @@ CREATE TABLE `temp_cart` (
     `quantity` INT NOT NULL DEFAULT 1,
     `price` float NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+);*/
+/*
 CREATE TABLE `detalle_pedidos` (
     `detalleId` INT AUTO_INCREMENT NOT NULL,
     `pedidoId` INT NOT NULL,
@@ -132,7 +144,8 @@ CREATE TABLE `detalle_pedidos` (
     CONSTRAINT `detalle_producto_key` FOREIGN KEY (`productoId`) REFERENCES `productos` (`productId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `detalle_pedido_key` FOREIGN KEY (`pedidoId`) REFERENCES `pedidos` (`pedidoId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4;
-
+*/
+/*
 CREATE TABLE `carretilla` (
     `usercod` BIGINT(10) NOT NULL,
     `productId` bigint(18) NOT NULL,
@@ -144,7 +157,8 @@ CREATE TABLE `carretilla` (
     CONSTRAINT `carretilla_user_key` FOREIGN KEY (`usercod`) REFERENCES `usuario` (`usercod`) ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT `carretilla_prd_key` FOREIGN KEY (`productId`) REFERENCES `productos` (`productId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
-
+*/
+/*
 CREATE TABLE `carretillaanon` (
     `anoncod` varchar(128) NOT NULL,
     `productId` bigint(18) NOT NULL,
@@ -154,8 +168,9 @@ CREATE TABLE `carretillaanon` (
     PRIMARY KEY (`anoncod`, `productId`),
     KEY `productId_idx` (`productId`),
     CONSTRAINT `carretillaanon_prd_key` FOREIGN KEY (`productId`) REFERENCES `productos` (`productId`) ON DELETE NO ACTION ON UPDATE NO ACTION
-);
+);*/
 /*Inserts*/
+/*
 INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Admin','Administradores','ACT');
 INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Client','Cliente','ACT');
 INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Orders','Controllers\\Administrator\\Orders','ACT','CTR');
@@ -165,8 +180,9 @@ INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Adm
 INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Orders','ACT','2025-08-09 00:00:00');
 INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Order\\update','ACT','2025-08-09 00:00:00');
 INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Menu_Administrator_Orders','ACT','2025-08-09 00:00:00');
-
+*/
 /*Trigger de la tabla usuario para que cada usuario que se ingrese agarre el rol de cliente*/
+/*
 CREATE TRIGGER client_role
 AFTER INSERT ON usuario
 FOR EACH ROW
@@ -175,8 +191,9 @@ DECLARE clientrole varchar(128);
 Select rolescod into clientrole FROM roles where rolescod='Client' LIMIT 1;
 INSERT INTO roles_usuarios(usercod,rolescod,roleuserest,roleuserfch,roleuserexp) VALUES ( NEW.usercod,clientrole,'ACT',NOW(), DATE_ADD(NOW(), INTERVAL 10 YEAR));
 END
-
+*/
 /*Trigger de la tabla detalle pedidos que elimina el stock del producto cuando se hace un pedido*/
+/*
 CREATE TRIGGER tr_reduce_stock_on_detail_insert
 BEFORE INSERT ON detalle_pedidos
 FOR EACH ROW
@@ -197,3 +214,4 @@ BEGIN
     END IF;
        
 END;
+*/
