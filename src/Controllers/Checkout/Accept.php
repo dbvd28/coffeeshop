@@ -13,10 +13,10 @@ class Accept extends PublicController
     private array $viewData;
     public function __construct()
     {
-        $this->viewdata = [
+        $this->viewData = [
             "pedidoId" => "",
-            "correo"=>"",
-            "estado"=>"",
+            "correo" => "",
+            "estado" => "",
             "nombre" => "",
             "fecha" => "",
             "total" => "",
@@ -39,9 +39,21 @@ class Accept extends PublicController
             $resultArray = json_decode(json_encode($result), true);
             $amount = $resultArray["purchase_units"][0]["payments"]["captures"][0]["amount"]["value"];
             $orderId = Orders::addOrder(Security::getUserId(), floatval($amount), $archivo);
-            Orders::transferTempCartToOrder(Security::getUserId(), $orderId);
-            $this->viewData["pedidoId"] = $orderId;
-            $this->getDataFromDB();
+            try {
+
+                if (Orders::transferTempCartToOrder(Security::getUserId(), $orderId)) {
+                    // Proceed
+                    $this->viewData["pedidoId"] = $orderId;
+                    $this->getDataFromDB();
+                } else {
+                }
+            } catch (\Exception $e) {
+                $this->throwError(  "Something went wrong, try again.","The product is not available.".$e->getMessage());
+                // Log error or show message
+                error_log($e->getMessage());
+                // Maybe render a user-friendly message or redirect
+            }
+
         } else {
             $dataview["orderjson"] = "No Order Available!!!";
         }
@@ -86,7 +98,7 @@ class Accept extends PublicController
     private function throwError(string $message, string $logMessage = "")
     {
         if (!empty($logMessage)) {
-            error_log(sprintf("%s - %s", $this->name, $this->$logMessage));
+            error_log(sprintf("%s - %s", $this->name, $logMessage));
         }
         Site::redirectToWithMsg(LIST_URL, $message);
     }
