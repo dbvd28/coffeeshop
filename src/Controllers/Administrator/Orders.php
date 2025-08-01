@@ -11,11 +11,11 @@ class Orders extends PrivateController{
     public function __construct(){
         parent::__construct();
         $this->viewData=[];
-         $this->viewData["isUpdateEnabled"]=parent::isFeatureAutorized($this->name."\update");
+        $this->viewData["isUpdateEnabled"]=parent::isFeatureAutorized($this->name."\update");
     }
     public function run():void{
     $this->viewData["pedidos"]=ODAO::getOrders();
-  Site::addLink("public/css/orders2.css");
+    Site::addLink("public/css/orders2.css");
     Renderer::render("Administrator/orders",$this->viewData);
     }
 }
