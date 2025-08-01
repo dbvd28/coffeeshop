@@ -1,6 +1,7 @@
 <h1 class="site-title">
-  <img src="public/imgs/hero/logo.png" alt="Logo Coffeeshop" class="logo">
+ <img src="public/imgs/hero/logo.png" alt="Logo Coffeeshop" class="logo">
   {{SITE_TITLE}}
+
 </h1><div class="product-list">
   {{foreach productos}}
   <div class="product-card" data-productId="{{productId}}">
@@ -22,3 +23,4 @@
   </div>
   {{endfor productos}}
 </div>
+
