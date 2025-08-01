@@ -53,3 +53,12 @@ CREATE TABLE
         KEY `productId_idx` (`productId`),
         CONSTRAINT `carretillaanon_prd_key` FOREIGN KEY (`productId`) REFERENCES `productos` (`productId`) ON DELETE NO ACTION ON UPDATE NO ACTION
     );
+
+CREATE TABLE `temp_cart` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` INT NOT NULL,
+    `product_id` INT NOT NULL,
+    `quantity` INT NOT NULL DEFAULT 1,
+    `price` float NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
