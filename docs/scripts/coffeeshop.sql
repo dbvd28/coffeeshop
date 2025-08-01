@@ -158,8 +158,8 @@ CREATE TABLE `carretillaanon` (
 /*Inserts*/
 INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Admin','Administradores','ACT');
 INSERT INTO `roles`(`rolescod`,`rolesdsc`,`rolesest`) VALUES('Client','Cliente','ACT');
-    INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Orders','Controllers\\Administrator\\Orders','ACT','CTR');
-    INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Order','Controllers\\Administrator\\Order','ACT','CTR');
+INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Orders','Controllers\\Administrator\\Orders','ACT','CTR');
+INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Order','Controllers\\Administrator\\Order','ACT','CTR');
 INSERT INTO `funciones`(`fncod`,`fndsc`,`fnest`,`fntyp`) VALUES('Controllers\\Administrator\\Order','Controllers\\Administrator\\Order\\update','ACT','CTR');
 INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Order','ACT','2025-08-09 00:00:00');
 INSERT INTO `funciones_roles`(`rolescod`,`fncod`,`fnrolest`,`fnexp`) VALUES('Admin','Controllers\\Administrator\\Orders','ACT','2025-08-09 00:00:00');
@@ -176,4 +176,24 @@ Select rolescod into clientrole FROM roles where rolescod='Client' LIMIT 1;
 INSERT INTO roles_usuarios(usercod,rolescod,roleuserest,roleuserfch,roleuserexp) VALUES ( NEW.usercod,clientrole,'ACT',NOW(), DATE_ADD(NOW(), INTERVAL 10 YEAR));
 END
 
-
+/*Trigger de la tabla detalle pedidos que elimina el stock del producto cuando se hace un pedido*/
+CREATE TRIGGER tr_reduce_stock_on_detail_insert
+BEFORE INSERT ON detalle_pedidos
+FOR EACH ROW
+BEGIN
+    DECLARE order_status VARCHAR(10);
+    DECLARE current_stock INT;
+    SELECT `productStock` INTO current_stock
+        FROM productos
+        WHERE productId = NEW.productoId;
+         IF current_stock >= NEW.cantidad THEN
+            UPDATE productos
+            SET `productStock` = `productStock` - NEW.cantidad
+            WHERE productId = NEW.productoId;
+        END IF;
+        IF current_stock < NEW.cantidad THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Not enough stock for this product';
+    END IF;
+       
+END;

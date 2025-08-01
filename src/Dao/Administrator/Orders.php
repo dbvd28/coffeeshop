@@ -34,9 +34,9 @@ class Orders extends Table
     public static function addOrder(int $user, float $total, string $archivo)
     {
         $sqlstr = "INSERT INTO pedidos (usercod,fchpedido,total,archivojson) VALUES(:user,:fecha,:total,:archivo)";
-        return self::executeInsert($sqlstr, ["user" => $user, "fecha" => time(), "total" => $total, "archivo" => $archivo]);
+        return self::executeInsert($sqlstr, ["user" => $user, "fecha" => date("Y-m-d H:i:s"), "total" => $total, "archivo" => $archivo]);
     }
-    public static function addToTempCart(int $userId, int $productId, int $cant,float $precio)
+    public static function addToTempCart(int $userId, int $productId, int $cant, float $precio)
     {
         $sql = "INSERT INTO temp_cart (user_id, product_id, quantity,price)
             VALUES (:user_id, :product_id, :quantity,:price)";
@@ -44,32 +44,56 @@ class Orders extends Table
             "user_id" => $userId,
             "product_id" => $productId,
             "quantity" => $cant,
-            "price"=>$precio,
+            "price" => $precio,
         ];
         return self::executeNonQuery($sql, $params);
     }
     public static function transferTempCartToOrder(int $userId, int $orderId)
     {
         // 1. Agarra los items del carrito
-        $sql = "SELECT product_id, quantity,price FROM temp_cart WHERE user_id = :user_id";
+        $sql = "SELECT product_id, quantity, price FROM temp_cart WHERE user_id = :user_id";
         $params = ["user_id" => $userId];
         $cartItems = self::obtenerRegistros($sql, $params);
 
-        // 2. Inserta en detalle_pedidos
         foreach ($cartItems as $item) {
-            $insert = "INSERT INTO detalle_pedidos (pedidoId, productoId, cantidad,precio_unitario)
-                   VALUES (:order_id, :product_id, :quantity, :price)";
+            $productId = $item["product_id"];
+            $quantity = $item["quantity"];
+
+            // 1.1 Verifica el stock actual
+            $stockCheck = self::obtenerUnRegistro(
+                "SELECT * FROM productos WHERE productId = :productId",
+                ["productId" => $productId]
+            );
+
+            if (!$stockCheck) {
+                 error_log(sprintf("%s", "No regreso ni un stcok"));
+             return false;
+               
+            }
+
+            if ($stockCheck["productStock"] < $quantity) {
+                error_log(sprintf("%s", "No hay suficientes"));
+                return false;
+                
+            }
+
+            // 2. Inserta en detalle_pedidos
+            $insert = "INSERT INTO detalle_pedidos (pedidoId, productoId, cantidad, precio_unitario)
+               VALUES (:order_id, :product_id, :quantity, :price)";
             $insertParams = [
                 "order_id" => $orderId,
-                "product_id" => $item["product_id"],
-                "quantity" => $item["quantity"],
-                "price"=>$item["price"]
+                "product_id" => $productId,
+                "quantity" => $quantity,
+                "price" => $item["price"]
             ];
             self::executeNonQuery($insert, $insertParams);
         }
 
         // 3. Elimina del carrito temporal
         $delete = "DELETE FROM temp_cart WHERE user_id = :user_id";
-        self::executeNonQuery($delete, ["user_id"=>$userId]);
+        self::executeNonQuery($delete, ["user_id" => $userId]);
+         $deletecart = "DELETE FROM carretilla WHERE usercod = :user_id";
+        self::executeNonQuery($deletecart, ["user_id" => $userId]);
+        return true;
     }
 }
