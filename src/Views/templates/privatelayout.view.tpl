@@ -43,7 +43,7 @@
     <span class="username">{{userName}} <a href="index.php?page=sec_logout"><i class="fas fa-sign-out-alt"></i></a></span>
     {{endwith login}}
   </header>
-  <main>
+  <main style="flex:1;">
     {{{page_content}}}
   </main>
   <footer style="background-color: #9c653d;">
