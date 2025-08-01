@@ -53,6 +53,7 @@ class Products extends PrivateController
 
     public function run(): void
     {
+        Site::addLink("public/css/indvProduct.css");
         $this->getQueryParamsData();
         if ($this->viewData["mode"] !== "INS") {
             $this->getDataFromDB();
