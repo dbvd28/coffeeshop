@@ -114,7 +114,7 @@ CREATE TABLE `pedidos` (
     CONSTRAINT `pedidos_usr_key` FOREIGN KEY (`usercod`) REFERENCES `usuario` (`usercod`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8mb4;
 
-CREATE TABLE temp_cart (
+CREATE TABLE `temp_cart` (
     id INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
     `product_id` INT NOT NULL,
