@@ -15,7 +15,7 @@ class Products extends PrivateController
 {
     private array $viewData;
     private array $modes;
-    private array $errors;
+    private array $status;
 
     public function __construct()
     {
@@ -28,9 +28,15 @@ class Products extends PrivateController
             "productName" => "",
             "productDescription" => "",
             "productPrice" => "",
-            "productImgUrl" => "",
             "productStock" => "",
-            "productStatus" => "ACT",
+            "estado" => "ACT",
+            "cat" => 0,
+            "prov" => 0,
+            "selectedidp" => "selected",
+            "selectedidc" => "selected",
+            "proveedor" => [],
+            "selectedACT" => "",
+            "selectedINA" => "",
             "errors" => [],
             "xsrfToken" => ""
         ];
@@ -42,124 +48,243 @@ class Products extends PrivateController
             "UPD" => "Editar Producto",
             "DSP" => "Detalle de Producto"
         ];
+        $this->status = ["INA", "ACT"];
     }
 
     public function run(): void
     {
-        $this->getQueryParams();
-
+        $this->getQueryParamsData();
         if ($this->viewData["mode"] !== "INS") {
-            $this->loadData();
+            $this->getDataFromDB();
+        } else {
+            $this->viewData["proveedor"] = ProductDAO::getAllProv();
+            $this->viewData["categoria"] = ProductDAO::getAllCat();
         }
-
         if ($this->isPostBack()) {
-            $this->getPostData();
-
-            if ($this->validate()) {
-                $this->saveData();
+            $this->getBodyData();
+            if ($this->validateData()) {
+                $this->processData();
             }
         }
-
-        $this->prepareView();
+        $this->prepareViewData();
+        // Site::addLink("public/css/order.css");
         Renderer::render("Administrator/product", $this->viewData);
     }
 
-    private function getQueryParams(): void
+    private function throwError(string $message, string $logMessage = "")
     {
-        if (!isset($_GET["mode"]) || !isset($this->modes[$_GET["mode"]])) {
-            Site::redirectToWithMsg(LIST_URL, "Modo inválido");
+        if (!empty($logMessage)) {
+            error_log(sprintf("%s - %s", $this->name, $logMessage));
+        }
+        Site::redirectToWithMsg(LIST_URL, $message);
+    }
+    private function innerError(string $scope, string $message)
+    {
+        if (!isset($this->viewData["errors"][$scope])) {
+            $this->viewData["errors"][$scope] = [$message];
+        } else {
+            $this->viewData["errors"][$scope][] = $message;
+        }
+    }
+
+    private function getQueryParamsData()
+    {
+        if (!isset($_GET["mode"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Attempt to load controler without the required query parameters MODE"
+            );
         }
         $this->viewData["mode"] = $_GET["mode"];
-        $this->viewData["modeDesc"] = $this->modes[$this->viewData["mode"]];
-
+        if (!isset($this->modes[$this->viewData["mode"]])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Attempt to load controler with  wrong value on query parameter MODE - " . $this->viewData["mode"]
+            );
+        }
         if ($this->viewData["mode"] !== "INS") {
-            if (!isset($_GET["id"]) || !is_numeric($_GET["id"])) {
-                Site::redirectToWithMsg(LIST_URL, "ID inválido");
+            if (!isset($_GET["id"])) {
+                $this->throwError(
+                    "Something went wrong, try again.",
+                    "Attempt to load controler without the required query parameters ID"
+                );
+            }
+            if (!is_numeric($_GET["id"])) {
+                $this->throwError(
+                    "Something went wrong, try again.",
+                    "Attempt to load controler with  wrong value on query parameter ID - " . $_GET["id"]
+                );
             }
             $this->viewData["productId"] = intval($_GET["id"]);
         }
     }
 
-    private function loadData(): void
+    private function getDataFromDB()
     {
-        $product = ProductDAO::getById($this->viewData["productId"]);
-        if (!$product) {
-            Site::redirectToWithMsg(LIST_URL, "Producto no encontrado");
-        }
-        $this->viewData = array_merge($this->viewData, $product);
-    }
-
-    private function getPostData(): void
-    {
-        $this->viewData["productName"] = $_POST["productName"] ?? "";
-        $this->viewData["productDescription"] = $_POST["productDescription"] ?? "";
-        $this->viewData["productPrice"] = $_POST["productPrice"] ?? "";
-        $this->viewData["productImgUrl"] = $_POST["productImgUrl"] ?? "";
-        $this->viewData["productStock"] = $_POST["productStock"] ?? "";
-        $this->viewData["productStatus"] = $_POST["productStatus"] ?? "INA";
-
-        // Validar xsrf token
-        $postToken = $_POST["xsrfToken"] ?? "";
-        if ($postToken !== $_SESSION[$this->name . "-xsrfToken"] ?? "") {
-            $this->errors["global"] = "Token de seguridad inválido.";
-        }
-    }
-
-    private function validate(): bool
-    {
-        if (empty($this->viewData["productName"])) {
-            $this->errors["productName"] = "El nombre es obligatorio.";
-        }
-        if (empty($this->viewData["productDescription"])) {
-            $this->errors["productDescription"] = "La descripción es obligatoria.";
-        }
-        if (!is_numeric($this->viewData["productPrice"]) || floatval($this->viewData["productPrice"]) < 0) {
-            $this->errors["productPrice"] = "El precio debe ser un número positivo.";
-        }
-        if (empty($this->viewData["productImgUrl"])) {
-            $this->errors["productImgUrl"] = "La URL de la imagen es obligatoria.";
-        }
-        if (!is_numeric($this->viewData["productStock"]) || intval($this->viewData["productStock"]) < 0) {
-            $this->errors["productStock"] = "El stock debe ser un número entero no negativo.";
-        }
-        if (!in_array($this->viewData["productStatus"], ["ACT", "INA", "DES"])) {
-            $this->errors["productStatus"] = "Estado inválido.";
-        }
-
-        $this->viewData["errors"] = $this->errors;
-        return count($this->errors) === 0;
-    }
-
-    private function saveData(): void
-    {
-        $data = [
-            "productName" => $this->viewData["productName"],
-            "productDescription" => $this->viewData["productDescription"],
-            "productPrice" => floatval($this->viewData["productPrice"]),
-            "productImgUrl" => $this->viewData["productImgUrl"],
-            "productStock" => intval($this->viewData["productStock"]),
-            "productStatus" => $this->viewData["productStatus"],
-        ];
-
-        if ($this->viewData["mode"] === "INS") {
-            if (ProductDAO::insert($data)) {
-                Site::redirectToWithMsg(LIST_URL, "Producto creado correctamente");
-            } else {
-                $this->errors["global"] = "Error al crear el producto.";
+        $tmpPedido = ProductDAO::getById(
+            $this->viewData["productId"]
+        );
+        if ($tmpPedido && count($tmpPedido) > 0) {
+            $this->viewData["productName"] = $tmpPedido["productName"];
+            $this->viewData["productDescription"] = $tmpPedido["productDescription"];
+            $this->viewData["productPrice"] = $tmpPedido["productPrice"];
+            $this->viewData["productStock"] = $tmpPedido["productStock"];
+            $this->viewData["estado"] = $tmpPedido["productStatus"];
+            $idp = $tmpPedido["proveedorId"];
+            $proveedores = ProductDAO::getAllProv();
+            foreach ($proveedores as &$proveedor) {
+                $proveedor["idc"] = ($proveedor["proveedorId"] == $idp) ? "selected" : "";
             }
-        } elseif ($this->viewData["mode"] === "UPD") {
-            if (ProductDAO::update($this->viewData["productId"], $data)) {
-                Site::redirectToWithMsg(LIST_URL, "Producto actualizado correctamente");
-            } else {
-                $this->errors["global"] = "Error al actualizar el producto.";
+            $idc = $tmpPedido["categoriaId"];
+            $categorias = ProductDAO::getAllCat();
+            foreach ($categorias as &$categoria) {
+                $categoria["idc"] = ($categoria["categoriaId"] == $idc) ? "selected" : "";
             }
+
+        } else {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Record for id " . $this->viewData["id"] . " not found."
+            );
         }
+        $this->viewData["proveedor"] = ProductDAO::getAllProv();
+        $this->viewData["categoria"] = ProductDAO::getAllCat();
     }
 
-    private function prepareView(): void
+    private function getBodyData()
     {
-        // Generar nuevo token xsrf para el formulario
-        $this->viewData["xsrfToken"] = hash("sha256", json_encode($this->viewData));
-        $_SESSION[$this->name . "-xsrfToken"] = $this->viewData["xsrfToken"];
+        if (!isset($_POST["id"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter ID on body"
+            );
+        }
+        if (!isset($_POST["nombre"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter DATE on body"
+            );
+        }
+        if (!isset($_POST["precio"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter CLIENT on body"
+            );
+        }
+        if (!isset($_POST["descripcion"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter EMAIL on body"
+            );
+        }
+        if (!isset($_POST["stock"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter STATUS on body"
+            );
+        }
+        if (!isset($_POST["xsrtoken"])) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post without parameter XSRTOKEN on body"
+            );
+        }
+        if (intval($_POST["id"]) !== $this->viewData["productId"]) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post with inconsistent parameter ID value has: " . $this->viewData["id"] . " recieved: " . $_POST["id"]
+            );
+        }
+        if ($_POST["xsrtoken"] !== $_SESSION[$this->name . "-xsrtoken"]) {
+            $this->throwError(
+                "Something went wrong, try again.",
+                "Trying to post with inconsistent parameter XSRToken value has: " . $_SESSION[$this->name . "-xsrtoken"] . " recieved: " . $_POST["xsrtoken"]
+            );
+        }
+        $this->viewData["productName"] = $_POST["nombre"];
+        $this->viewData["productDescription"] = $_POST["descripcion"];
+        $this->viewData["productPrice"] = $_POST["precio"];
+        $this->viewData["productStock"] = $_POST["stock"];
+        $this->viewData["estado"] = $_POST["status"];
+        $this->viewData["prov"] = $_POST["prov"];
+        $this->viewData["cat"] = $_POST["cat"];
+
+    }
+
+    private function validateData(): bool
+    {
+        if (Validators::IsEmpty($this->viewData["estado"])) {
+            $this->innerError("estado", "This field is required.");
+        }
+        if (!in_array($this->viewData["estado"], $this->status)) {
+            $this->innerError("estado", "This field is required.");
+        }
+
+        return !(count($this->viewData["errors"]) > 0);
+    }
+
+    private function processData()
+    {
+        $mode = $this->viewData["mode"];
+        switch ($mode) {
+            case "INS":
+                if (
+                    ProductDAO::newProduct(
+                        $this->viewData["productName"],
+                        $this->viewData["productDescription"],
+                        floatval($this->viewData["productPrice"]),
+                        $this->viewData["productStock"],
+                        $this->viewData["estado"],
+                        intval($this->viewData["prov"]),
+                        intval($this->viewData["cat"])
+                    ) > 0
+                ) {
+                    Site::redirectToWithMsg(LIST_URL, "Product created successfuly");
+                } else {
+                    $this->innerError("global", "Something wrong happend to save the new Category.");
+                }
+                break;
+            case "UPD":
+                if (
+                    ProductDAO::update(
+                        intval($this->viewData["productId"]),
+                        $this->viewData["productName"],
+                        $this->viewData["productDescription"],
+                        floatval($this->viewData["productPrice"]),
+                        $this->viewData["productStock"],
+                        $this->viewData["estado"],
+                        intval($this->viewData["prov"]),
+                        intval($this->viewData["cat"])
+                    ) > 0
+                ) {
+                    Site::redirectToWithMsg(LIST_URL, "Product updated successfuly");
+                } else {
+                    $this->innerError("global", "Something wrong happend while updating the Order.");
+                }
+                break;
+        }
+    }
+    private function prepareViewData()
+    {
+
+        $this->viewData['selected' . $this->viewData["estado"]] = "selected";
+
+        if (count($this->viewData["errors"]) > 0) {
+            foreach ($this->viewData["errors"] as $scope => $errorsArray) {
+                $this->viewData["errors_" . $scope] = $errorsArray;
+            }
+        }
+
+        if ($this->viewData["mode"] === "DSP") {
+            $this->viewData["cancelLabel"] = "Back";
+            $this->viewData["showConfirm"] = false;
+        }
+
+        if ($this->viewData["mode"] === "DSP" || $this->viewData["mode"] === "DEL") {
+            $this->viewData["readonly"] = "readonly";
+        }
+        $this->viewData["timestamp"] = time();
+        $this->viewData["xsrtoken"] = hash("sha256", json_encode($this->viewData));
+        $_SESSION[$this->name . "-xsrtoken"] = $this->viewData["xsrtoken"];
     }
 }

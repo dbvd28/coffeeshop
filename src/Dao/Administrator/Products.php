@@ -23,17 +23,53 @@ class Products extends Table
         return self::executeNonQuery($sql, $data);
     }
 
-    public static function update(int $id, array $data): bool
+    public static function update(int $id, string $nombre,string $dsc,float $prc,int $stc,string $est,int $prov,int $cat): bool
     {
-        $data["productId"] = $id;
         $sql = "UPDATE productos SET
                     productName = :productName,
                     productDescription = :productDescription,
                     productPrice = :productPrice,
-                    productImgUrl = :productImgUrl,
                     productStock = :productStock,
-                    productStatus = :productStatus
+                    productStatus = :productStatus,
+                    proveedorId=:proveedorId,
+                    categoriaId=:categoriaId
                 WHERE productId = :productId";
-        return self::executeNonQuery($sql, $data);
+        $params=[
+            "productId"=>$id,
+            "productName"=>$nombre,
+            "productDescription"=>$dsc,
+            "productPrice"=>$prc,
+            "productStock"=>$stc,
+            "productStatus"=>$est,
+            "proveedorId"=>$prov,
+            "categoriaId"=>$cat
+        ];
+        return self::executeNonQuery($sql,$params );
+    }
+     public static function newProduct( string $nombre,string $dsc,float $prc,int $stc,string $est,int $prov,int $cat)
+    {
+        $sqlstr = "INSERT INTO productos (productName,productDescription, productPrice,productImgUrl,productStock, productStatus, proveedorId,categoriaId) 
+        values (:productName,:productDescription,:productPrice,:productImgUrl,:productStock,:productStatus,:proveedorId,:categoriaId);";
+        return self::executeNonQuery(
+            $sqlstr,
+            [
+            "productName"=>$nombre,
+            "productDescription"=>$dsc,
+            "productPrice"=>$prc,
+            "productImgUrl"=>"",
+            "productStock"=>$stc,
+            "productStatus"=>$est,
+            "proveedorId"=>$prov,
+            "categoriaId"=>$cat
+            ]
+        );
+    }
+         public static function getAllProv(): array
+    {
+        return self::obtenerRegistros("SELECT * FROM proveedores", []);
+    }
+     public static function getAllCat(): array
+    {
+        return self::obtenerRegistros("SELECT * FROM categorias", []);
     }
 }

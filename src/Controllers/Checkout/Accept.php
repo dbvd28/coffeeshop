@@ -2,17 +2,19 @@
 
 namespace Controllers\Checkout;
 
+use Controllers\PrivateController;
 use Controllers\PublicController;
 use Dao\Administrator\Orders;
 use Utilities\Security;
 use Utilities\Site;
 use Dao\Administrator\Orders as ODAO;
 const LIST_URL = "index.php?page=Checkout-Checkout";
-class Accept extends PublicController
+class Accept extends PrivateController
 {
     private array $viewData;
     public function __construct()
     {
+        parent::__construct();
         $this->viewData = [
             "pedidoId" => "",
             "correo" => "",
@@ -42,16 +44,14 @@ class Accept extends PublicController
             try {
 
                 if (Orders::transferTempCartToOrder(Security::getUserId(), $orderId)) {
-                    // Proceed
+       
                     $this->viewData["pedidoId"] = $orderId;
                     $this->getDataFromDB();
                 } else {
+                       $this->throwError(  "Su producto no esta disponible por los momentos","The product is not available.");
                 }
             } catch (\Exception $e) {
                 $this->throwError(  "Something went wrong, try again.","The product is not available.".$e->getMessage());
-                // Log error or show message
-                error_log($e->getMessage());
-                // Maybe render a user-friendly message or redirect
             }
 
         } else {
