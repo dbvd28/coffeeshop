@@ -1,4 +1,5 @@
 <div class="container">
+  <button class="back-btn" id="back_btn">Atras</button>
   <h1>Pedido #{{id}}</h1>
   <div>
     <p><strong>Fecha:</strong> {{fecha}}</p>
@@ -28,5 +29,16 @@
       {{endfor productos}}
     </tbody>
   </table>
- <!-- <a class="btn view" href="index.php?page=Client-Order&mode=DSP&id={{pedidoId}}">-->
+
 </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded",()=>{
+      document.getElementById("back_btn")
+        .addEventListener("click", (e)=>{
+          e.preventDefault();
+          e.stopPropagation();
+          window.location.assign("index.php?page=Client-Orders");
+        });
+    });
+  </script>
