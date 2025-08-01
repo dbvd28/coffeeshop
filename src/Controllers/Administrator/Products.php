@@ -69,7 +69,7 @@ class Products extends PrivateController
             }
         }
         $this->prepareViewData();
-        // Site::addLink("public/css/order.css");
+        Site::addLink("public/css/indvProduct.css");
         Renderer::render("Administrator/product", $this->viewData);
     }
 
