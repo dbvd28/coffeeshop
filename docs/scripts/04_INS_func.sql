@@ -6,8 +6,10 @@ INSERT INTO `funciones` (`fncod`, `fndsc`, `fnest`, `fntyp`) VALUES
 ('Controllers\\Administrator\\ProductsList', 'Controllers\\Administrator\\ProductsList', 'ACT', 'CTR'),
 ('Controllers\\Checkout\\Accept', 'Controllers\\Checkout\\Accept', 'ACT', 'CTR'),
 ('Controllers\\Client\\Order', 'Controllers\\Client\\Order', 'ACT', 'CTR'),
+('Controllers\\Client\\User', 'Controllers\\Client\\User', 'ACT', 'CTR'),
 ('Controllers\\Client\\Orders', 'Controllers\\Client\\Orders', 'ACT', 'CTR'),
 ('Menu_Administrator_Orders', 'Menu_Administrator_Orders', 'ACT', 'MNU'),
 ('Menu_Administrator_Products', 'Menu_Administrator_Products', 'ACT', 'MNU'),
 ('Menu_Client_Orders', 'Menu_Client_Orders', 'ACT', 'MNU'),
+('Menu_Username', 'Menu_Username', 'ACT', 'MNU'),
 ('Menu_PaymentCheckout', 'Menu_PaymentCheckout', 'ACT', 'MNU');
